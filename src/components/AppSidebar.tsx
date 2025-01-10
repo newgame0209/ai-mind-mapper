@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, FileText, Plus } from "lucide-react";
+import { Home, FileText, Plus, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -36,11 +36,7 @@ const SidebarContent = () => {
     <div className="flex h-full flex-col gap-4">
       <div className="flex h-16 items-center border-b px-6">
         <Link to="/" className="flex items-center gap-3">
-          <img
-            src="/lovable-uploads/aaefa8b2-bc8f-4976-a159-4941e1014363.png"
-            alt="AI Mind Map"
-            className="h-8 w-8"
-          />
+          <Gem className="h-8 w-8 text-primary" />
           <span className="text-xl font-bold">AI Mind Map</span>
         </Link>
       </div>
