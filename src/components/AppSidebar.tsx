@@ -24,7 +24,7 @@ const menuItems = [
 ];
 
 const SidebarMenuItem = ({ children }: { children: React.ReactNode }) => {
-  return <div className="mb-1">{children}</div>;
+  return <div className="mb-2">{children}</div>;
 };
 
 const SidebarMenuButton = Button;
@@ -34,23 +34,28 @@ const SidebarContent = () => {
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="flex h-14 items-center border-b px-6">
-        <Link to="/" className="flex items-center gap-2 font-semibold">
-          AI Mind Map
+      <div className="flex h-16 items-center border-b px-6">
+        <Link to="/" className="flex items-center gap-3">
+          <img
+            src="/lovable-uploads/aaefa8b2-bc8f-4976-a159-4941e1014363.png"
+            alt="AI Mind Map"
+            className="h-8 w-8"
+          />
+          <span className="text-xl font-bold">AI Mind Map</span>
         </Link>
       </div>
       <ScrollArea className="flex-1">
-        <div className="px-3">
+        <div className="px-4">
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
                 isActive={location.pathname === item.path}
                 variant="ghost"
-                className="w-full justify-start"
+                className="w-full justify-start text-lg py-3"
               >
-                <Link to={item.path} className="flex items-center gap-2">
-                  <item.icon className="h-4 w-4" />
+                <Link to={item.path} className="flex items-center gap-3">
+                  <item.icon className="h-6 w-6" />
                   {item.title}
                 </Link>
               </SidebarMenuButton>
@@ -67,7 +72,7 @@ export const AppSidebar = () => {
 
   return (
     <>
-      <aside className="hidden w-64 shrink-0 border-r lg:block">
+      <aside className="hidden w-72 shrink-0 border-r lg:block">
         <SidebarContent />
       </aside>
 
@@ -80,7 +85,7 @@ export const AppSidebar = () => {
             <span className="sr-only">サイドバーを開く</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-72 p-0">
           <SidebarContent />
         </SheetContent>
       </Sheet>
