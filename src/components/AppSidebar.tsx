@@ -63,7 +63,7 @@ const SidebarContent = () => {
 };
 
 export const AppSidebar = () => {
-  const { isOpen, setIsOpen } = useSidebar();
+  const { state, setOpen } = useSidebar();
 
   return (
     <>
@@ -71,7 +71,7 @@ export const AppSidebar = () => {
         <SidebarContent />
       </aside>
 
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={state === "expanded"} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button
             variant="ghost"
