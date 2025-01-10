@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import MindMaps from "./pages/MindMaps";
 import Create from "./pages/Create";
+import Result from "./pages/Result";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/mindmaps" element={<MindMaps />} />
                 <Route path="/create" element={<Create />} />
+                <Route path="/result/:id" element={<Result />} />
               </Routes>
             </main>
           </div>
