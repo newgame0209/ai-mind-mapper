@@ -28,6 +28,7 @@ const Create = () => {
   };
 
   const callDifyApi = async (data: { pdf?: string; url?: string }) => {
+    let responseData;
     try {
       const requestBody = {
         inputs: {
@@ -42,7 +43,7 @@ const Create = () => {
         ...requestBody,
         inputs: {
           ...requestBody.inputs,
-          pdf: data.pdf ? "base64-data" : undefined // PDFデータは長すぎるのでログには出力しない
+          pdf: data.pdf ? "base64-data" : undefined
         }
       });
 
@@ -55,8 +56,8 @@ const Create = () => {
         body: JSON.stringify(requestBody)
       });
 
-      const responseData = await response.json();
-      
+      responseData = await response.json();
+
       if (!response.ok) {
         console.error("Dify API error details:", responseData);
         throw new Error(`API error: ${response.status} - ${JSON.stringify(responseData)}`);
