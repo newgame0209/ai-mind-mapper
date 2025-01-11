@@ -38,11 +38,12 @@ const Create = () => {
         body: JSON.stringify(data)
       });
 
-      console.log("Status:", response.status);
-      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
       const responseData = await response.json();
       console.log("Response:", responseData);
-
       return responseData;
 
     } catch (error) {
