@@ -43,32 +43,29 @@ const Create = () => {
 
   // Dify APIを呼び出す関数
   const callDifyApi = async (data: { pdf?: string; url?: string }) => {
-    try {
-      const response = await fetch(DIFY_API_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Authorization': DIFY_API_TOKEN,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-      });
+    const response = await fetch(DIFY_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Authorization': DIFY_API_TOKEN,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
 
-      console.log('APIレスポンスステータス:', response.status);
-      const responseData = await response.json();
-      console.log('APIレスポンス:', responseData);
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('認証エラー: APIトークンを確認してください');
-        }
-        throw new Error(`APIエラー: ${response.status}`);
+    console.log('APIレスポンスステータス:', response.status);
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('認証エラー: APIトークンを確認してください');
       }
-
-      return responseData;
-    } catch (error) {
-      console.error('API呼び出しエラー:', error);
-      throw error;
+      const errorData = await response.json();
+      console.log('APIエラーレスポンス:', errorData);
+      throw new Error(`APIエラー: ${response.status}`);
     }
+
+    const responseData = await response.json();
+    console.log('APIレスポンス:', responseData);
+    return responseData;
   };
 
   const handleGenerate = async () => {
