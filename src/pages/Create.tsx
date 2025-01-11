@@ -34,9 +34,17 @@ const Create = () => {
           pdf: data.pdf,
           url: data.url
         },
-        response_mode: "streaming",  // blockingからstreamingに変更
+        response_mode: "streaming",
         user: "user-123"
       };
+
+      console.log("Sending request to Dify API:", {
+        ...requestBody,
+        inputs: {
+          ...requestBody.inputs,
+          pdf: data.pdf ? "base64-data" : undefined // PDFデータは長すぎるのでログには出力しない
+        }
+      });
 
       const response = await fetch("https://api.dify.ai/v1/workflows/run", {
         method: "POST",
@@ -48,11 +56,13 @@ const Create = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+        const errorData = await response.json();
+        console.error("Dify API error details:", errorData);
+        throw new Error(`API error: ${response.status} - ${JSON.stringify(errorData)}`);
       }
 
       const responseData = await response.json();
-      console.log("Response:", responseData);
+      console.log("Dify API response:", responseData);
       return responseData;
 
     } catch (error) {
