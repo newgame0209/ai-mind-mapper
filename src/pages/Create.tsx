@@ -29,7 +29,7 @@ const Create = () => {
 
   const callDifyApi = async (data: { pdf?: string; url?: string }) => {
     try {
-      const response = await fetch("http://localhost/v1/workflows/run", {
+      const response = await fetch("https://api.dify.ai/v1/workflows/run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,16 +40,13 @@ const Create = () => {
 
       console.log("Status:", response.status);
       
-      // レスポンスボディを1回だけ読み取る
       const responseData = await response.json();
       console.log("Response:", responseData);
 
-      // エラーレスポンスの場合でも処理を継続
       return responseData;
 
     } catch (error) {
       console.error("API呼び出しエラー:", error);
-      // エラー情報をより詳細に
       if (error instanceof Error) {
         throw new Error(`API呼び出し失敗: ${error.message}`);
       }
