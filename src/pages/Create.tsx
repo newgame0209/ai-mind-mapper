@@ -33,7 +33,7 @@ const Create = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer app-ug721ZAP7A3LqcKaApJMyWxs"
+          "Authorization": "Bearer app-Fk0xJxMQKsEAi8hRg9Q9ihk3"
         },
         body: JSON.stringify(data)
       });
