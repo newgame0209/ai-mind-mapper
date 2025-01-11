@@ -29,13 +29,22 @@ const Create = () => {
 
   const callDifyApi = async (data: { pdf?: string; url?: string }) => {
     try {
+      const requestBody = {
+        inputs: {
+          pdf: data.pdf,
+          url: data.url
+        },
+        response_mode: "blocking",
+        user: "user-123"  // ユーザーIDは固定値として設定
+      };
+
       const response = await fetch("https://api.dify.ai/v1/workflows/run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer app-Fk0xJxMQKsEAi8hRg9Q9ihk3"
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
