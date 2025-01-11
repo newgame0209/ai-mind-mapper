@@ -13,13 +13,11 @@ const Create = () => {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // PDFファイルをBase64に変換する関数
   const convertPdfToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
         if (typeof reader.result === "string") {
-          // Base64文字列からプレフィックスを削除
           const base64String = reader.result.split(",")[1];
           resolve(base64String);
         }
@@ -29,7 +27,6 @@ const Create = () => {
     });
   };
 
-  // Dify APIを呼び出す関数
   const callDifyApi = async (data: { pdf?: string; url?: string }) => {
     try {
       const response = await fetch("http://localhost/v1/workflows/run", {
@@ -43,7 +40,7 @@ const Create = () => {
 
       console.log("Status:", response.status);
       
-      // レスポンスの本文を一度だけ読み取る
+      // レスポンスボディを1回だけ読み取る
       const responseData = await response.json();
       console.log("Response:", responseData);
 
@@ -52,7 +49,11 @@ const Create = () => {
 
     } catch (error) {
       console.error("API呼び出しエラー:", error);
-      throw error;
+      // エラー情報をより詳細に
+      if (error instanceof Error) {
+        throw new Error(`API呼び出し失敗: ${error.message}`);
+      }
+      throw new Error("予期せぬエラーが発生しました");
     }
   };
 
