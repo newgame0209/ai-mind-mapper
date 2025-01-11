@@ -34,8 +34,8 @@ const Create = () => {
           pdf: data.pdf,
           url: data.url
         },
-        response_mode: "blocking",
-        user: "user-123"  // ユーザーIDは固定値として設定
+        response_mode: "streaming",  // blockingからstreamingに変更
+        user: "user-123"
       };
 
       const response = await fetch("https://api.dify.ai/v1/workflows/run", {
