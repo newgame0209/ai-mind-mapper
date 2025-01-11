@@ -11,6 +11,55 @@ const Create = () => {
   const navigate = useNavigate();
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // PDFファイルをBase64に変換する関数
+  const convertPdfToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          // Base64文字列からプレフィックスを削除
+          const base64String = reader.result.split(",")[1];
+          resolve(base64String);
+        }
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Dify APIを呼び出す関数
+  const callDifyApi = async (data: { pdf?: string; url?: string }) => {
+    try {
+      const response = await fetch("http://localhost/v1/workflows/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer app-ug721ZAP7A3LqcKaApJMyWxs"
+        },
+        body: JSON.stringify(data)
+      });
+
+      console.log("Status:", response.status);
+      
+      const responseData = await response.json();
+      console.log("Response:", responseData);
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("認証エラーが発生しました。APIキーを確認してください。");
+        }
+        throw new Error(`APIエラー: ${response.status} ${responseData.message || "不明なエラー"}`);
+      }
+
+      return responseData;
+
+    } catch (error) {
+      console.error("API呼び出しエラー:", error);
+      throw error;
+    }
+  };
 
   const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -22,24 +71,47 @@ const Create = () => {
     }
   };
 
-  const handlePdfGenerate = () => {
+  const handlePdfGenerate = async () => {
     if (!pdfFile) {
       toast.error("PDFファイルを選択してください");
       return;
     }
-    console.log("PDF生成開始:", { fileName: pdfFile.name, fileSize: pdfFile.size });
-    toast.success("マインドマップを生成中です");
-    navigate("/result/1");
+
+    setIsLoading(true);
+    try {
+      console.log("PDF生成開始:", { fileName: pdfFile.name, fileSize: pdfFile.size });
+      const base64Pdf = await convertPdfToBase64(pdfFile);
+      const result = await callDifyApi({ pdf: base64Pdf });
+      console.log("API呼び出し成功:", result);
+      toast.success("マインドマップを生成中です");
+      navigate("/result/1");
+    } catch (error) {
+      console.error("処理エラー:", error);
+      toast.error(error instanceof Error ? error.message : "予期せぬエラーが発生しました");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleUrlGenerate = () => {
+  const handleUrlGenerate = async () => {
     if (!url.trim()) {
       toast.error("URLを入力してください");
       return;
     }
-    console.log("URL生成開始:", { url });
-    toast.success("マインドマップを生成中です");
-    navigate("/result/1");
+
+    setIsLoading(true);
+    try {
+      console.log("URL生成開始:", { url });
+      const result = await callDifyApi({ url: url.trim() });
+      console.log("API呼び出し成功:", result);
+      toast.success("マインドマップを生成中です");
+      navigate("/result/1");
+    } catch (error) {
+      console.error("処理エラー:", error);
+      toast.error(error instanceof Error ? error.message : "予期せぬエラーが発生しました");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,7 +142,7 @@ const Create = () => {
                 size="lg" 
                 className="text-lg px-8 py-6 h-auto"
                 onClick={handlePdfGenerate}
-                disabled={!pdfFile}
+                disabled={!pdfFile || isLoading}
               >
                 マインドマップを生成
               </Button>
@@ -94,7 +166,7 @@ const Create = () => {
                 size="lg" 
                 className="w-full text-lg h-14"
                 onClick={handleUrlGenerate}
-                disabled={!url.trim()}
+                disabled={!url.trim() || isLoading}
               >
                 マインドマップを生成
               </Button>
