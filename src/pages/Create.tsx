@@ -55,13 +55,13 @@ const Create = () => {
         body: JSON.stringify(requestBody)
       });
 
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Dify API error details:", errorData);
-        throw new Error(`API error: ${response.status} - ${JSON.stringify(errorData)}`);
+        console.error("Dify API error details:", responseData);
+        throw new Error(`API error: ${response.status} - ${JSON.stringify(responseData)}`);
       }
 
-      const responseData = await response.json();
       console.log("Dify API response:", responseData);
       return responseData;
 
