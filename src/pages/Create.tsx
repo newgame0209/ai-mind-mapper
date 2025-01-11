@@ -28,23 +28,27 @@ const Create = () => {
   };
 
   const callDifyApi = async (data: { pdf?: string; url?: string }) => {
-    let responseData;
     try {
       const requestBody = {
         inputs: {
-          pdf: data.pdf,
           url: data.url
         },
+        files: data.pdf ? [{
+          type: "document",
+          content: data.pdf,
+          name: "uploaded.pdf"
+        }] : [],
         response_mode: "streaming",
         user: "user-123"
       };
 
       console.log("Sending request to Dify API:", {
         ...requestBody,
-        inputs: {
-          ...requestBody.inputs,
-          pdf: data.pdf ? "base64-data" : undefined
-        }
+        files: data.pdf ? [{
+          type: "document",
+          content: "base64-data",
+          name: "uploaded.pdf"
+        }] : []
       });
 
       const response = await fetch("https://api.dify.ai/v1/workflows/run", {
@@ -56,7 +60,7 @@ const Create = () => {
         body: JSON.stringify(requestBody)
       });
 
-      responseData = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
         console.error("Dify API error details:", responseData);
