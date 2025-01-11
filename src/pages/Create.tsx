@@ -43,6 +43,7 @@ const Create = () => {
 
       console.log("Status:", response.status);
       
+      // レスポンスの本文を一度だけ読み取る
       const responseData = await response.json();
       console.log("Response:", responseData);
 
@@ -50,6 +51,7 @@ const Create = () => {
         if (response.status === 401) {
           throw new Error("認証エラーが発生しました。APIキーを確認してください。");
         }
+        // エラーメッセージはすでに読み取ったresponseDataから取得
         throw new Error(`APIエラー: ${response.status} ${responseData.message || "不明なエラー"}`);
       }
 
