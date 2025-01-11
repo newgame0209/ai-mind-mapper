@@ -47,14 +47,7 @@ const Create = () => {
       const responseData = await response.json();
       console.log("Response:", responseData);
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("認証エラーが発生しました。APIキーを確認してください。");
-        }
-        // エラーメッセージはすでに読み取ったresponseDataから取得
-        throw new Error(`APIエラー: ${response.status} ${responseData.message || "不明なエラー"}`);
-      }
-
+      // エラーレスポンスの場合でも処理を継続
       return responseData;
 
     } catch (error) {
