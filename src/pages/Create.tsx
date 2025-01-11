@@ -7,10 +7,14 @@ import { FileUp, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
+const DIFY_API_ENDPOINT = "http://localhost/v1/workflows/run";
+const DIFY_API_TOKEN = "Bearer app-ug721ZAP7A3LqcKaApJMyWxs";
+
 const Create = () => {
   const navigate = useNavigate();
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [url, setUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -22,24 +26,79 @@ const Create = () => {
     }
   };
 
-  const handlePdfGenerate = () => {
-    if (!pdfFile) {
-      toast.error("PDFファイルを選択してください");
-      return;
-    }
-    console.log("PDF生成開始:", { fileName: pdfFile.name, fileSize: pdfFile.size });
-    toast.success("マインドマップを生成中です");
-    navigate("/result/1");
+  // PDFファイルをBase64に変換する関数
+  const convertPdfToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        // データURLからBase64部分のみを抽出
+        const base64Content = base64String.split(',')[1];
+        resolve(base64Content);
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
   };
 
-  const handleUrlGenerate = () => {
-    if (!url.trim()) {
-      toast.error("URLを入力してください");
-      return;
+  // Dify APIを呼び出す関数
+  const callDifyApi = async (data: { pdf?: string; url?: string }) => {
+    try {
+      const response = await fetch(DIFY_API_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Authorization': DIFY_API_TOKEN,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+
+      console.log('APIレスポンスステータス:', response.status);
+      const responseData = await response.json();
+      console.log('APIレスポンス:', responseData);
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('認証エラー: APIトークンを確認してください');
+        }
+        throw new Error(`APIエラー: ${response.status}`);
+      }
+
+      return responseData;
+    } catch (error) {
+      console.error('API呼び出しエラー:', error);
+      throw error;
     }
-    console.log("URL生成開始:", { url });
-    toast.success("マインドマップを生成中です");
-    navigate("/result/1");
+  };
+
+  const handleGenerate = async () => {
+    try {
+      setIsLoading(true);
+      let requestData = {};
+
+      if (pdfFile) {
+        const base64Pdf = await convertPdfToBase64(pdfFile);
+        requestData = { pdf: base64Pdf };
+        console.log('PDFをアップロード:', { fileName: pdfFile.name });
+      } else if (url.trim()) {
+        requestData = { url: url.trim() };
+        console.log('URLを送信:', { url });
+      } else {
+        toast.error("PDFファイルまたはURLを入力してください");
+        return;
+      }
+
+      const result = await callDifyApi(requestData);
+      console.log('生成完了:', result);
+      toast.success("マインドマップを生成中です");
+      navigate("/result/1");
+
+    } catch (error) {
+      console.error('生成エラー:', error);
+      toast.error(error instanceof Error ? error.message : "エラーが発生しました");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -69,10 +128,10 @@ const Create = () => {
               <Button 
                 size="lg" 
                 className="text-lg px-8 py-6 h-auto"
-                onClick={handlePdfGenerate}
-                disabled={!pdfFile}
+                onClick={handleGenerate}
+                disabled={!pdfFile || isLoading}
               >
-                マインドマップを生成
+                {isLoading ? "生成中..." : "マインドマップを生成"}
               </Button>
             </div>
           </Card>
@@ -93,10 +152,10 @@ const Create = () => {
               <Button 
                 size="lg" 
                 className="w-full text-lg h-14"
-                onClick={handleUrlGenerate}
-                disabled={!url.trim()}
+                onClick={handleGenerate}
+                disabled={!url.trim() || isLoading}
               >
-                マインドマップを生成
+                {isLoading ? "生成中..." : "マインドマップを生成"}
               </Button>
             </div>
           </Card>
